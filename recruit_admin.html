@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>卓募集管理 | やゆよのMM</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: #f5f3ef; color: #2c2c2c; padding-bottom: 4rem; }
+    .container { max-width: 680px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.3rem; color: #1a1a2e; border-left: 4px solid #c9a84c; padding-left: .8rem; margin-bottom: .3rem; }
+    .lead { font-size: .82rem; color: #888; margin-bottom: 2rem; }
+    .section { background: white; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.07); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .section-title { font-size: .78rem; font-weight: bold; color: #c9a84c; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1.2rem; }
+    .form-row { margin-bottom: 1rem; }
+    label { display: block; font-size: .8rem; color: #666; margin-bottom: .3rem; }
+    input[type=text], input[type=number] {
+      width: 100%; padding: .42rem .7rem; border: 1px solid #ddd; border-radius: 6px;
+      font-size: .88rem; font-family: inherit; background: #fafaf8;
+    }
+    input:focus { outline: none; border-color: #c9a84c; background: white; }
+    textarea { width: 100%; padding: .42rem .7rem; border: 1px solid #ddd; border-radius: 6px; font-size: .88rem; font-family: inherit; background: #fafaf8; resize: vertical; }
+    textarea:focus { outline: none; border-color: #c9a84c; background: white; }
+    .btn-primary { padding: .5rem 1.4rem; background: #1a1a2e; color: #e8d8b4; border: none; border-radius: 6px; font-size: .88rem; cursor: pointer; font-family: inherit; transition: background .15s; }
+    .btn-primary:hover { background: #2a2a4e; }
+    .msg { font-size: .82rem; color: #888; margin-top: .7rem; min-height: 1.2em; }
+    .session-row { border: 1px solid #eee; border-radius: 8px; padding: .9rem 1rem; margin-bottom: .8rem; background: #fafaf8; }
+    .session-row-title { font-size: .95rem; font-weight: bold; color: #1a1a2e; margin-bottom: .3rem; }
+    .session-row-meta { font-size: .78rem; color: #888; margin-bottom: .6rem; }
+    .session-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .btn-sm { padding: .25rem .65rem; font-size: .75rem; border-radius: 5px; cursor: pointer; font-family: inherit; border: 1px solid transparent; transition: all .15s; }
+    .btn-full  { background: #e6f4ea; color: #2e7d32; border-color: #a5d6a7; }
+    .btn-full:hover  { background: #2e7d32; color: white; }
+    .btn-full.active { background: #2e7d32; color: white; }
+    .btn-del   { background: #fdecea; color: #c62828; border-color: #ef9a9a; }
+    .btn-del:hover   { background: #c62828; color: white; }
+    .sub-list { margin-top: .5rem; display: flex; flex-direction: column; gap: .3rem; }
+    .sub-item { display: flex; align-items: center; justify-content: space-between; font-size: .8rem; padding: .15rem .5rem; border-radius: 4px; background: #f0f0f0; }
+    .sub-item .del-p { background: none; border: none; cursor: pointer; font-size: .75rem; color: #aaa; padding: 0; font-family: inherit; }
+    .sub-item .del-p:hover { color: #c62828; }
+
+    /* ---- パスワード画面 ---- */
+    #pw-overlay { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    #pw-box { background: #fff; border-radius: 12px; padding: 2.5rem 2rem; width: min(340px, 90vw); text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+    #pw-box h2 { font-size: 1rem; color: #1a1a2e; margin-bottom: .4rem; }
+    #pw-box p  { font-size: .78rem; color: #999; margin-bottom: 1.2rem; }
+    #pw-input  { width: 100%; padding: .5rem .8rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; font-family: inherit; text-align: center; letter-spacing: .15em; margin-bottom: .8rem; }
+    #pw-input:focus { outline: none; border-color: #c9a84c; }
+    #pw-btn { width: 100%; padding: .55rem; background: #1a1a2e; color: #e8d8b4; border: none; border-radius: 6px; font-size: .9rem; font-family: inherit; cursor: pointer; }
+    #pw-btn:hover { background: #2a2a4e; }
+    #pw-err { font-size: .78rem; color: #c62828; margin-top: .6rem; min-height: 1em; }
+  </style>
+</head>
+<body>
+
+  <!-- パスワード認証 -->
+  <div id="pw-overlay">
+    <div id="pw-box">
+      <h2>🔒 メンバー専用ページ</h2>
+      <p>パスワードを入力してください</p>
+      <input id="pw-input" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') checkPw()">
+      <button id="pw-btn" onclick="checkPw()">入力</button>
+      <div id="pw-err"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const KEY = 'mm_auth_admin';
+      const PW  = 'yyyyy';
+      if (sessionStorage.getItem(KEY) === '1') document.getElementById('pw-overlay').style.display = 'none';
+      window.checkPw = function () {
+        const val = document.getElementById('pw-input').value;
+        if (val === PW) {
+          sessionStorage.setItem(KEY, '1');
+          document.getElementById('pw-overlay').style.display = 'none';
+        } else {
+          document.getElementById('pw-err').textContent = '⚠️ パスワードが違います';
+          document.getElementById('pw-input').value = '';
+          document.getElementById('pw-input').focus();
+        }
+      };
+    })();
+  </script>
+
+  <header>
+    <h1 style="display:none"></h1>
+  </header>
+
+  <nav class="site-nav">
+    <a href="index.html"         class="nav-link">🔍 レビュー</a>
+    <a href="recruit.html"       class="nav-link">🎭 卓募集</a>
+    <a href="recruit_admin.html" class="nav-link active">📋 卓募集管理</a>
+    <a href="admin.html"         class="nav-link">⚙️ レビュー管理</a>
+  </nav>
+
+  <div class="container">
+    <h1>📋 卓募集管理</h1>
+    <p class="lead">GM専用管理ページ</p>
+
+    <div class="section">
+      <div class="section-title">＋ 新しい卓を作成</div>
+      <div class="form-row">
+        <label>シナリオ名 *</label>
+        <input type="text" id="f-scenario" placeholder="例：水の都に鐘の音を！" maxlength="80">
+      </div>
+      <div class="form-row">
+        <label>定員 *</label>
+        <input type="number" id="f-capacity" min="1" max="20" value="4">
+      </div>
+      <div class="form-row">
+        <label>GM名</label>
+        <input type="text" id="f-gm" placeholder="例：やゆよ" maxlength="30">
+      </div>
+      <div class="form-row">
+        <label>BOOTHリンク（任意）</label>
+        <input type="text" id="f-booth" placeholder="https://booth.pm/...">
+      </div>
+      <div class="form-row">
+        <label>コメント（任意）</label>
+        <textarea id="f-comment" rows="3" placeholder="募集に関するひとことなど"></textarea>
+      </div>
+      <button class="btn-primary" onclick="createSession()">作成する</button>
+      <div class="msg" id="create-msg"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">卓一覧</div>
+      <div id="session-list"><p style="font-size:.82rem;color:#bbb">読み込み中…</p></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    let sessions = [];
+
+    async function load() {
+      const { data } = await db.from('recruit_sessions').select('*, recruit_participants(*)').order('created_at', { ascending: true });
+      sessions = data || [];
+      renderList();
+    }
+
+    function renderList() {
+      const el = document.getElementById('session-list');
+      if (!sessions.length) { el.innerHTML = '<p style="font-size:.82rem;color:#bbb">まだ卓がありません</p>'; return; }
+      el.innerHTML = sessions.map(s => {
+        const ps = s.recruit_participants || [];
+        const fullCls   = s.is_full ? 'active' : '';
+        const fullLabel = s.is_full ? '🎉 満員御礼中' : '🎉 満員御礼にする';
+        const pRows = ps.map(p => `
+          <div class="sub-item">
+            <span>${p.status === '観戦希望' ? '👁' : '🙋'} ${esc(p.handle_name)}（${esc(p.status)}）${p.comment ? `　<em style="color:#888;font-size:.75rem">${esc(p.comment)}</em>` : ''}</span>
+            <button class="del-p" onclick="deleteParticipant('${p.id}','${s.id}')">×</button>
+          </div>`).join('');
+        return `
+          <div class="session-row" id="srow-${s.id}">
+            <div class="session-row-title">🎭 ${esc(s.scenario_name)}</div>
+            <div class="session-row-meta">定員${s.capacity}人｜GM:${esc(s.gm_name || '未設定')}｜参加${ps.length}人</div>
+            ${s.comment ? `<div style="font-size:.8rem;color:#666;margin-bottom:.5rem;">💬 ${esc(s.comment)}</div>` : ''}
+            <div class="session-actions">
+              <button class="btn-sm btn-full ${fullCls}" onclick="toggleFull('${s.id}',${s.is_full})">${fullLabel}</button>
+              <button class="btn-sm btn-del"             onclick="deleteSession('${s.id}')">🗑 削除</button>
+            </div>
+            ${ps.length ? `<div class="sub-list">${pRows}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    async function createSession() {
+      const scenario = document.getElementById('f-scenario').value.trim();
+      const capacity = parseInt(document.getElementById('f-capacity').value, 10);
+      const gm       = document.getElementById('f-gm').value.trim();
+      const booth    = document.getElementById('f-booth').value.trim();
+      const comment  = document.getElementById('f-comment').value.trim();
+      const msg      = document.getElementById('create-msg');
+      if (!scenario) { msg.textContent = '⚠️ シナリオ名を入力してください'; return; }
+      if (!capacity || capacity < 1) { msg.textContent = '⚠️ 定員を入力してください'; return; }
+      const { error } = await db.from('recruit_sessions').insert({
+        scenario_name: scenario, capacity, gm_name: gm || null, booth_url: booth || null, comment: comment || null, is_full: false
+      });
+      if (error) { msg.textContent = '❌ ' + error.message; return; }
+      msg.textContent = '✅ 作成しました！';
+      ['f-scenario','f-gm','f-booth','f-comment'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('f-capacity').value = '4';
+      await load();
+      setTimeout(() => { msg.textContent = ''; }, 3000);
+    }
+
+    async function toggleFull(id, currentFull) {
+      await db.from('recruit_sessions').update({ is_full: !currentFull }).eq('id', id);
+      await load();
+    }
+
+    async function deleteSession(id) {
+      if (!confirm('この卓と参加者データをすべて削除しますか？')) return;
+      await db.from('recruit_participants').delete().eq('session_id', id);
+      await db.from('recruit_sessions').delete().eq('id', id);
+      await load();
+    }
+
+    async function deleteParticipant(pid, sid) {
+      await db.from('recruit_participants').delete().eq('id', pid);
+      await load();
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    load();
+  </script>
+</body>
+</html>

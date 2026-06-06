@@ -1,0 +1,689 @@
+/* ============================================================
+   マーダーミステリー レビューブログ — スタイルシート
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Hiragino Mincho ProN', 'Georgia', 'Noto Serif JP', serif;
+  background: #f5f3ef;
+  color: #2c2c2c;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   ヘッダー
+   ============================================================ */
+header {
+  background: #1a1a2e;
+  color: #e8d8b4;
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+  border-bottom: 3px solid #c9a84c;
+  position: relative;
+}
+
+header::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  background: #c9a84c;
+  margin: 1rem auto 0;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  letter-spacing: 0.12em;
+  font-weight: normal;
+}
+
+header .subtitle {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  letter-spacing: 0.08em;
+}
+
+/* ============================================================
+   メインコンテンツ
+   ============================================================ */
+main {
+  max-width: 760px;
+  margin: 2.5rem auto 4rem;
+  padding: 0 1.2rem;
+}
+
+/* ============================================================
+   統計バー
+   ============================================================ */
+.stats-bar {
+  background: #1a1a2e;
+  color: #e8d8b4;
+  border-radius: 8px;
+  padding: 0.9rem 1.5rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  border: 1px solid #c9a84c40;
+}
+
+.stats-item span {
+  opacity: 0.6;
+  margin-right: 0.3rem;
+}
+
+/* ============================================================
+   レビューカード
+   ============================================================ */
+.review-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  border-top: 4px solid #c9a84c;
+  transition: box-shadow 0.2s;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* カードヘッダー */
+.card-header {
+  padding: 1.4rem 1.5rem;
+  background: #faf9f6;
+  border-bottom: 1px solid #edeae4;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.card-title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #1a1a2e;
+  line-height: 1.4;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.card-meta-item::before {
+  margin-right: 0.25rem;
+}
+
+.booth-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  background: #1a1a2e;
+  color: #e8d8b4;
+  padding: 0.3rem 0.9rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  transition: background 0.2s, color 0.2s;
+}
+
+.booth-link:hover {
+  background: #c9a84c;
+  color: #1a1a2e;
+}
+
+/* 総合スコア */
+.total-score-area {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.score-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #1a1a2e;
+  color: #e8d8b4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border: 3px solid #c9a84c;
+}
+
+.score-circle .score-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.score-circle .score-denom {
+  font-size: 0.58rem;
+  opacity: 0.6;
+}
+
+.total-label {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+/* サブスコア */
+.card-scores {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid #edeae4;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.score-row:last-child {
+  margin-bottom: 0;
+}
+
+.score-label {
+  width: 140px;
+  font-size: 0.78rem;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.score-bar-bg {
+  flex: 1;
+  height: 7px;
+  background: #eeece8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #b8922a, #e8d8b4);
+  border-radius: 4px;
+}
+
+.score-num {
+  width: 28px;
+  text-align: right;
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: #1a1a2e;
+}
+
+/* コメント */
+.card-comment {
+  padding: 1.2rem 1.5rem;
+  font-size: 0.88rem;
+  line-height: 1.9;
+  color: #444;
+  border-left: 3px solid #c9a84c40;
+  margin: 0 1.5rem 1.2rem;
+  font-style: italic;
+}
+
+/* ============================================================
+   空状態
+   ============================================================ */
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   感想 折り畳み
+   ============================================================ */
+.card-comment-wrapper {
+  margin: 0 1.5rem 0;
+  border-left: 3px solid #c9a84c40;
+}
+
+.card-comment-wrapper > summary {
+  cursor: pointer;
+  padding: 0.65rem 1rem;
+  font-size: 0.8rem;
+  color: #999;
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.card-comment-wrapper > summary::-webkit-details-marker { display: none; }
+
+.card-comment-wrapper > summary::after {
+  content: '▶';
+  font-size: 0.6rem;
+  margin-left: 0.2rem;
+  display: inline-block;
+  transition: transform 0.18s;
+}
+
+.card-comment-wrapper[open] > summary::after { transform: rotate(90deg); }
+.card-comment-wrapper > summary:hover { color: #555; }
+
+.card-comment-wrapper .card-comment {
+  margin: 0;
+  padding: 0 1rem 1rem;
+  border-left: none;
+}
+
+/* ============================================================
+   いいね・通過記録
+   ============================================================ */
+.reaction-section {
+  padding: 0.75rem 1.5rem 1rem;
+  border-top: 1px solid #edeae4;
+}
+
+.reaction-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.reaction-emoji { font-size: 0.88rem; line-height: 1; }
+
+.reaction-count {
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: #1a1a2e;
+  min-width: 1rem;
+}
+
+.reaction-names {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.reaction-item {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.btn-reaction-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0;
+  color: inherit;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.reaction-item:hover .btn-reaction-del { opacity: 0.6; }
+.btn-reaction-del:hover { opacity: 1 !important; }
+
+.reaction-item.played {
+  background: #e6f4ea;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.reaction-item.unplayed {
+  background: #fff8e1;
+  color: #e65100;
+  border: 1px solid #ffe082;
+}
+
+.btn-reaction {
+  padding: 0.22rem 0.62rem;
+  background: transparent;
+  border: 1px solid #c9a84c80;
+  border-radius: 12px;
+  color: #c9a84c;
+  font-size: 0.72rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-reaction:hover { background: #c9a84c; color: #1a1a2e; }
+
+.reaction-form {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.reaction-input {
+  padding: 0.32rem 0.65rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  width: 140px;
+  background: #fafaf8;
+  transition: border-color 0.2s;
+}
+
+.reaction-input:focus { outline: none; border-color: #c9a84c; background: white; }
+
+.reaction-played-label {
+  font-size: 0.78rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-reaction-submit {
+  padding: 0.32rem 0.75rem;
+  background: #1a1a2e;
+  color: #e8d8b4;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.btn-reaction-submit:hover { background: #2a2a4e; }
+
+/* ============================================================
+   いいね
+   ============================================================ */
+.like-section {
+  padding: 0.6rem 1.5rem 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid #edeae4;
+}
+
+.btn-like {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.75rem;
+  background: transparent;
+  border: 1px solid #f0c4c4;
+  border-radius: 20px;
+  color: #c0706a;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.btn-like:hover  { background: #ffe8e8; border-color: #e08080; }
+.btn-like:active { transform: scale(0.92); }
+.btn-like.pop    { animation: like-pop 0.35s ease; }
+
+@keyframes like-pop {
+  0%   { transform: scale(1);    }
+  40%  { transform: scale(1.28); }
+  100% { transform: scale(1);    }
+}
+
+.like-count {
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: #c0706a;
+}
+
+/* ============================================================
+   通過記録
+   ============================================================ */
+.play-record-section {
+  padding: 0.65rem 1.5rem 0.9rem;
+  border-top: 1px solid #edeae4;
+}
+
+.play-record-title {
+  font-size: 0.68rem;
+  color: #ccc;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+
+/* ============================================================
+   カード静的ヘッダー（タイトル・BOOTHリンク）
+   ============================================================ */
+.card-static-header {
+  padding: 1.2rem 1.5rem 0.9rem;
+  background: #faf9f6;
+  border-bottom: 1px solid #edeae4;
+}
+
+/* ============================================================
+   レビュアー切り替えナビ
+   ============================================================ */
+.reviewer-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.2rem;
+  background: #1a1a2e;
+  color: #e8d8b4;
+  border-bottom: 1px solid #c9a84c30;
+}
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid #c9a84c60;
+  border-radius: 4px;
+  padding: 0.12rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: #c9a84c;
+  font-family: inherit;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+
+.nav-btn:hover { background: #c9a84c; color: #1a1a2e; }
+
+.nav-text {
+  flex: 1;
+  text-align: center;
+  font-size: 0.76rem;
+  color: #e8d8b4;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   フィルターバー
+   ============================================================ */
+.filter-section {
+  background: #1a1a2e;
+  color: #e8d8b4;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 2px solid #c9a84c40;
+}
+
+.filter-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.filter-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  opacity: 0.55;
+  margin-bottom: 0.9rem;
+  text-transform: uppercase;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-row-label {
+  font-size: 0.76rem;
+  opacity: 0.65;
+  min-width: 56px;
+  flex-shrink: 0;
+}
+
+/* 総合点レンジ */
+.range-control {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.range-val {
+  font-size: 0.88rem;
+  font-weight: bold;
+  color: #c9a84c;
+  min-width: 2.2rem;
+  text-align: center;
+}
+
+.range-sep { font-size: 0.8rem; opacity: 0.45; }
+
+input[type="range"].filter-range {
+  width: 100px;
+  accent-color: #c9a84c;
+  cursor: pointer;
+}
+
+/* こだわりチップ */
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filter-chip {
+  padding: 0.28rem 0.72rem;
+  background: transparent;
+  border: 1px solid #c9a84c55;
+  border-radius: 20px;
+  color: #e8d8b4;
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.filter-chip:hover    { border-color: #c9a84c; background: #c9a84c20; }
+.filter-chip.active   { background: #c9a84c; border-color: #c9a84c; color: #1a1a2e; font-weight: bold; }
+
+/* 件数＋クリア */
+.filter-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.76rem;
+  opacity: 0.65;
+}
+
+.btn-clear-filter {
+  background: transparent;
+  border: 1px solid #c9a84c55;
+  color: #e8d8b4;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.btn-clear-filter:hover { border-color: #c9a84c; background: #c9a84c20; }
+
+/* ============================================================
+   サイトナビゲーション
+   ============================================================ */
+.site-nav {
+  background: #1a1a2e;
+  display: flex;
+  border-bottom: 2px solid #c9a84c40;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.site-nav .nav-link {
+  color: #e8d8b480;
+  text-decoration: none;
+  padding: .6rem 1.1rem;
+  font-size: .78rem;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  border-right: 1px solid #c9a84c15;
+  transition: background .15s, color .15s;
+  font-family: 'Hiragino Mincho ProN', 'Georgia', serif;
+}
+
+.site-nav .nav-link:hover { background: #c9a84c30; color: #e8d8b4; }
+.site-nav .nav-link.active { color: #c9a84c; border-bottom: 2px solid #c9a84c; }
+
+/* ============================================================
+   フッター
+   ============================================================ */
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.75rem;
+  color: #bbb;
+  border-top: 1px solid #edeae4;
+}
+
+/* ============================================================
+   レスポンシブ
+   ============================================================ */
+@media (max-width: 560px) {
+  header h1 { font-size: 1.4rem; }
+  .card-header { flex-direction: column; }
+  .total-score-area { display: flex; align-items: center; gap: 0.8rem; }
+  .total-label { margin-top: 0; }
+  .score-label { width: 100px; font-size: 0.74rem; }
+  .card-comment { margin: 0 1rem 1rem; }
+}

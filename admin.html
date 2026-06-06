@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レビュー管理 | やゆよのMM</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: #f5f3ef; color: #2c2c2c; padding-bottom: 4rem; }
+    .container { max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.3rem; color: #1a1a2e; border-left: 4px solid #c9a84c; padding-left: .8rem; margin-bottom: .3rem; }
+    .lead { font-size: .82rem; color: #888; margin-bottom: 2rem; }
+    .section { background: white; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.07); padding: 1.5rem; margin-bottom: 1.5rem; }
+    .section-title { font-size: .78rem; font-weight: bold; color: #c9a84c; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 1rem; }
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: .82rem; color: #555; margin-bottom: .3rem; }
+    label .required { color: #c9a84c; margin-left: .2rem; }
+    input[type="text"], input[type="url"], input[type="date"], input[type="number"], textarea {
+      width: 100%; padding: .55rem .8rem; border: 1px solid #ddd; border-radius: 6px;
+      font-size: .9rem; font-family: inherit; color: #2c2c2c; background: #fafaf8; transition: border-color .2s;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #c9a84c; background: white; }
+    textarea { height: 90px; resize: vertical; }
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .score-field label { display: flex; justify-content: space-between; align-items: center; }
+    .score-display { font-weight: bold; color: #1a1a2e; font-size: .9rem; min-width: 2.5rem; text-align: right; }
+    input[type="range"] { width: 100%; accent-color: #c9a84c; cursor: pointer; }
+    .total-field { grid-column: 1 / -1; background: #faf9f6; border: 1px solid #edeae4; border-radius: 8px; padding: .8rem 1rem; }
+    .message { display: none; padding: .8rem 1rem; border-radius: 8px; font-size: .88rem; margin-bottom: 1rem; }
+    .message.success { display: block; background: #e6f4ea; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .message.error   { display: block; background: #fce8e6; color: #c62828; border: 1px solid #ef9a9a; }
+    .btn { width: 100%; padding: .9rem; border: none; border-radius: 8px; font-size: 1rem; font-family: inherit; cursor: pointer; transition: background .2s; }
+    .btn-primary { background: #1a1a2e; color: #e8d8b4; }
+    .btn-primary:hover { background: #2a2a4e; }
+    .btn-primary:disabled { background: #888; cursor: not-allowed; }
+    .review-list-item { display: flex; justify-content: space-between; align-items: center; padding: .75rem 0; border-bottom: 1px solid #edeae4; gap: .5rem; }
+    .review-list-item:last-child { border-bottom: none; }
+    .review-list-info { flex: 1; min-width: 0; }
+    .review-list-title { font-size: .88rem; font-weight: bold; color: #1a1a2e; }
+    .review-list-meta  { font-size: .75rem; color: #999; margin-top: .15rem; }
+    .review-list-score { font-size: 1rem; font-weight: bold; color: #c9a84c; min-width: 3rem; text-align: center; }
+    .btn-del  { padding: .3rem .7rem; background: #fce8e6; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; font-size: .78rem; cursor: pointer; white-space: nowrap; }
+    .btn-del:hover  { background: #ef9a9a; color: white; }
+    .btn-edit { padding: .3rem .7rem; background: #e8f0fe; color: #1a56c4; border: 1px solid #b3c7f9; border-radius: 4px; font-size: .78rem; cursor: pointer; white-space: nowrap; }
+    .btn-edit:hover { background: #b3c7f9; }
+    .btn-cancel { display: none; width: 100%; margin-top: .5rem; padding: .65rem; background: #f5f3ef; color: #888; border: 1px solid #ddd; border-radius: 8px; font-size: .9rem; font-family: inherit; cursor: pointer; }
+    .btn-cancel:hover { background: #edeae4; }
+    .edit-notice { display: none; background: #e8f0fe; color: #1a56c4; border: 1px solid #b3c7f9; border-radius: 8px; padding: .7rem 1rem; font-size: .82rem; margin-bottom: 1rem; }
+    .loading { text-align: center; color: #aaa; padding: 1rem; font-size: .85rem; }
+
+    /* ---- パスワード画面 ---- */
+    #pw-overlay { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    #pw-box { background: #fff; border-radius: 12px; padding: 2.5rem 2rem; width: min(340px, 90vw); text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+    #pw-box h2 { font-size: 1rem; color: #1a1a2e; margin-bottom: .4rem; }
+    #pw-box p  { font-size: .78rem; color: #999; margin-bottom: 1.2rem; }
+    #pw-input  { width: 100%; padding: .5rem .8rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; font-family: inherit; text-align: center; letter-spacing: .15em; margin-bottom: .8rem; }
+    #pw-input:focus { outline: none; border-color: #c9a84c; }
+    #pw-btn { width: 100%; padding: .55rem; background: #1a1a2e; color: #e8d8b4; border: none; border-radius: 6px; font-size: .9rem; font-family: inherit; cursor: pointer; }
+    #pw-btn:hover { background: #2a2a4e; }
+    #pw-err { font-size: .78rem; color: #c62828; margin-top: .6rem; min-height: 1em; }
+  </style>
+</head>
+<body>
+
+  <!-- パスワード認証 -->
+  <div id="pw-overlay">
+    <div id="pw-box">
+      <h2>🔒 メンバー専用ページ</h2>
+      <p>パスワードを入力してください</p>
+      <input id="pw-input" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') checkPw()">
+      <button id="pw-btn" onclick="checkPw()">入力</button>
+      <div id="pw-err"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const KEY = 'mm_auth_admin';
+      const PW  = 'yyyyy';
+      if (sessionStorage.getItem(KEY) === '1') document.getElementById('pw-overlay').style.display = 'none';
+      window.checkPw = function () {
+        const val = document.getElementById('pw-input').value;
+        if (val === PW) {
+          sessionStorage.setItem(KEY, '1');
+          document.getElementById('pw-overlay').style.display = 'none';
+        } else {
+          document.getElementById('pw-err').textContent = '⚠️ パスワードが違います';
+          document.getElementById('pw-input').value = '';
+          document.getElementById('pw-input').focus();
+        }
+      };
+    })();
+  </script>
+
+  <header>
+    <h1 style="display:none"></h1>
+  </header>
+
+  <nav class="site-nav">
+    <a href="index.html"         class="nav-link">🔍 レビュー</a>
+    <a href="recruit.html"       class="nav-link">🎭 卓募集</a>
+    <a href="recruit_admin.html" class="nav-link">📋 卓募集管理</a>
+    <a href="admin.html"         class="nav-link active">⚙️ レビュー管理</a>
+  </nav>
+
+  <div class="container">
+    <h1>⚙️ レビュー管理</h1>
+    <p class="lead">フォームに入力して「登録する」を押すだけで自動反映されます</p>
+
+    <div id="edit-notice" class="edit-notice">✏️ 編集モード：フォームを変更して「更新する」を押してください</div>
+    <div id="message" class="message"></div>
+
+    <div class="section">
+      <div class="section-title">新規レビュー追加</div>
+      <div class="field">
+        <label>作品タイトル <span class="required">*</span></label>
+        <input type="text" id="title" placeholder="例：君と最後の夏休みを！">
+      </div>
+      <div class="field">
+        <label>BOOTH URL</label>
+        <input type="url" id="boothUrl" placeholder="https://booth.pm/ja/items/...">
+      </div>
+      <div class="field">
+        <label>サムネイル画像URL <span style="font-size:.75rem;color:#aaa;font-weight:normal;">（任意）BOOTHの商品画像を右クリック→画像アドレスをコピー</span></label>
+        <input type="url" id="ogImageUrl" placeholder="https://booth.pximg.net/...">
+      </div>
+      <div class="field">
+        <label>プレイ日 <span class="required">*</span></label>
+        <input type="date" id="playDate">
+      </div>
+      <div class="field">
+        <label>担当キャラクター</label>
+        <input type="text" id="playerCharacter" placeholder="例：蒼井英">
+      </div>
+      <div class="field">
+        <label>レビュアー名（ハンドルネーム）</label>
+        <input type="text" id="reviewerName" placeholder="例：やゆよ">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">スコア（総合100点・各項目10点満点）</div>
+      <div class="score-grid">
+        <div class="field score-field total-field">
+          <label>総合スコア <span class="score-display" id="val-total">80</span><span style="font-size:.75rem;color:#aaa;margin-left:.2rem;">/ 100</span></label>
+          <input type="range" id="score-total" min="0" max="100" step="1" value="80"
+            oninput="document.getElementById('val-total').textContent = this.value">
+        </div>
+        <div class="field score-field">
+          <label>推理 <span class="score-display" id="val-suiri">8</span></label>
+          <input type="range" id="score-suiri" min="0" max="10" step="1" value="8"
+            oninput="document.getElementById('val-suiri').textContent = this.value">
+        </div>
+        <div class="field score-field">
+          <label>ロールプレイの楽しさ <span class="score-display" id="val-roleplay">8</span></label>
+          <input type="range" id="score-roleplay" min="0" max="10" step="1" value="8"
+            oninput="document.getElementById('val-roleplay').textContent = this.value">
+        </div>
+        <div class="field score-field">
+          <label>デザイン <span class="score-display" id="val-design">8</span></label>
+          <input type="range" id="score-design" min="0" max="10" step="1" value="8"
+            oninput="document.getElementById('val-design').textContent = this.value">
+        </div>
+        <div class="field score-field">
+          <label>ギミック <span class="score-display" id="val-gimmick">8</span></label>
+          <input type="range" id="score-gimmick" min="0" max="10" step="1" value="8"
+            oninput="document.getElementById('val-gimmick').textContent = this.value">
+        </div>
+        <div class="field score-field">
+          <label>キャラクター <span class="score-display" id="val-character">8</span></label>
+          <input type="range" id="score-character" min="0" max="10" step="1" value="8"
+            oninput="document.getElementById('val-character').textContent = this.value">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">感想</div>
+      <div class="field">
+        <textarea id="comment" placeholder="感想・おすすめポイントなど（改行してもOK）"></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-submit" onclick="submitReview()">✅ 登録する</button>
+    <button class="btn btn-cancel"  id="btn-cancel"  onclick="cancelEdit()">キャンセル（新規登録に戻る）</button>
+
+    <div class="section" style="margin-top:2rem;">
+      <div class="section-title">登録済みレビュー一覧</div>
+      <div id="review-list-admin"><p class="loading">読み込み中...</p></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    let editingId = null;
+    document.getElementById('playDate').value = new Date().toISOString().slice(0, 10);
+    window.addEventListener('DOMContentLoaded', loadList);
+
+    async function loadList() {
+      const listEl = document.getElementById('review-list-admin');
+      listEl.innerHTML = '<p class="loading">読み込み中...</p>';
+      const { data, error } = await sb.from('reviews').select('id,title,play_date,player_character,score_total').order('play_date', { ascending: false });
+      if (error) { listEl.innerHTML = `<p style="color:#c00;font-size:.85rem;">${error.message}</p>`; return; }
+      if (!data || !data.length) { listEl.innerHTML = '<p class="loading">登録されていません</p>'; return; }
+      listEl.innerHTML = '';
+      data.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'review-list-item';
+        item.innerHTML = `
+          <div class="review-list-info">
+            <div class="review-list-title">${escHtml(r.title)}</div>
+            <div class="review-list-meta">${r.play_date}　👤 ${escHtml(r.player_character)}</div>
+          </div>
+          <div class="review-list-score">${r.score_total}</div>
+          <button class="btn-edit" onclick="startEdit(${r.id})">編集</button>
+          <button class="btn-del"  onclick="deleteReview(${r.id}, '${escAttr(r.title)}')">削除</button>`;
+        listEl.appendChild(item);
+      });
+    }
+
+    async function submitReview() {
+      const title     = document.getElementById('title').value.trim();
+      const play_date = document.getElementById('playDate').value;
+      if (!title)     { showMsg('error', '作品タイトルを入力してください'); return; }
+      if (!play_date) { showMsg('error', 'プレイ日を入力してください'); return; }
+      const btn = document.getElementById('btn-submit');
+      const isEditing = editingId !== null;
+      btn.disabled = true;
+      btn.textContent = isEditing ? '更新中...' : '登録中...';
+      const payload = {
+        title,
+        booth_url:        document.getElementById('boothUrl').value.trim() || null,
+        og_image_url:     document.getElementById('ogImageUrl').value.trim() || null,
+        play_date,
+        player_character: document.getElementById('playerCharacter').value.trim() || '―',
+        reviewer_name:    document.getElementById('reviewerName').value.trim(),
+        score_total:      parseInt(document.getElementById('score-total').value),
+        score_suiri:      parseInt(document.getElementById('score-suiri').value),
+        score_roleplay:   parseInt(document.getElementById('score-roleplay').value),
+        score_design:     parseInt(document.getElementById('score-design').value),
+        score_gimmick:    parseInt(document.getElementById('score-gimmick').value),
+        score_character:  parseInt(document.getElementById('score-character').value),
+        comment:          document.getElementById('comment').value.trim(),
+      };
+      let error;
+      if (isEditing) {
+        ({ error } = await sb.from('reviews').update(payload).eq('id', editingId));
+      } else {
+        ({ error } = await sb.from('reviews').insert([payload]));
+      }
+      btn.disabled = false;
+      if (error) {
+        showMsg('error', `${isEditing ? '更新' : '登録'}に失敗しました：${error.message}`);
+        btn.textContent = isEditing ? '✏️ 更新する' : '✅ 登録する';
+      } else {
+        showMsg('success', `「${title}」を${isEditing ? '更新' : '登録'}しました！`);
+        cancelEdit(); loadList();
+      }
+    }
+
+    async function startEdit(reviewId) {
+      const { data, error } = await sb.from('reviews').select('*').eq('id', reviewId).single();
+      if (error) { alert('データ取得に失敗しました：' + error.message); return; }
+      editingId = reviewId;
+      document.getElementById('title').value           = data.title           || '';
+      document.getElementById('boothUrl').value        = data.booth_url       || '';
+      document.getElementById('ogImageUrl').value      = data.og_image_url    || '';
+      document.getElementById('playDate').value        = data.play_date       || '';
+      document.getElementById('playerCharacter').value = data.player_character || '';
+      document.getElementById('reviewerName').value    = data.reviewer_name   || '';
+      document.getElementById('comment').value         = data.comment         || '';
+      const scoreMap = { total: data.score_total, suiri: data.score_suiri, roleplay: data.score_roleplay, design: data.score_design, gimmick: data.score_gimmick, character: data.score_character };
+      Object.entries(scoreMap).forEach(([k, v]) => {
+        const el  = document.getElementById(`score-${k}`);
+        const val = document.getElementById(`val-${k}`);
+        const def = k === 'total' ? 80 : 8;
+        if (el)  el.value = v ?? def;
+        if (val) val.textContent = v ?? def;
+      });
+      document.getElementById('btn-submit').textContent    = '✏️ 更新する';
+      document.getElementById('btn-cancel').style.display  = 'block';
+      document.getElementById('edit-notice').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+      editingId = null; resetForm();
+      document.getElementById('btn-submit').textContent    = '✅ 登録する';
+      document.getElementById('btn-cancel').style.display  = 'none';
+      document.getElementById('edit-notice').style.display = 'none';
+    }
+
+    async function deleteReview(id, title) {
+      if (!confirm(`「${title}」を削除しますか？`)) return;
+      const { error } = await sb.from('reviews').delete().eq('id', id);
+      if (error) { showMsg('error', `削除に失敗しました：${error.message}`); }
+      else { showMsg('success', `「${title}」を削除しました`); loadList(); }
+    }
+
+    function resetForm() {
+      ['title','boothUrl','ogImageUrl','playerCharacter','reviewerName','comment'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('playDate').value = new Date().toISOString().slice(0, 10);
+      ['total','suiri','roleplay','design','gimmick','character'].forEach(k => {
+        const def = k === 'total' ? '80' : '8';
+        document.getElementById('score-' + k).value = def;
+        document.getElementById('val-' + k).textContent = def;
+      });
+    }
+
+    function showMsg(type, text) {
+      const el = document.getElementById('message');
+      el.className = `message ${type}`; el.textContent = text;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => { el.className = 'message'; }, 5000);
+    }
+
+    function escHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function escAttr(s) {
+      if (!s) return '';
+      return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

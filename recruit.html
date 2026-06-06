@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>卓募集 | やゆよのMM</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ---- パスワード画面 ---- */
+    #pw-overlay {
+      position: fixed; inset: 0;
+      background: #1a1a2e;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    #pw-box {
+      background: #fff; border-radius: 12px;
+      padding: 2.5rem 2rem; width: min(340px, 90vw);
+      text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+    #pw-box h2 { font-size: 1rem; color: #1a1a2e; margin-bottom: .4rem; font-weight: bold; }
+    #pw-box p  { font-size: .78rem; color: #999; margin-bottom: 1.2rem; }
+    #pw-input {
+      width: 100%; padding: .5rem .8rem;
+      border: 1px solid #ddd; border-radius: 6px;
+      font-size: 1rem; font-family: inherit;
+      text-align: center; letter-spacing: .15em; margin-bottom: .8rem;
+    }
+    #pw-input:focus { outline: none; border-color: #c9a84c; }
+    #pw-btn {
+      width: 100%; padding: .55rem;
+      background: #1a1a2e; color: #e8d8b4;
+      border: none; border-radius: 6px;
+      font-size: .9rem; font-family: inherit;
+      cursor: pointer; transition: background .15s;
+    }
+    #pw-btn:hover { background: #2a2a4e; }
+    #pw-err { font-size: .78rem; color: #c62828; margin-top: .6rem; min-height: 1em; }
+
+    /* ---- 卓募集スタイル ---- */
+    .recruit-card {
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      margin-bottom: 2rem; overflow: hidden;
+      border-top: 4px solid #c9a84c;
+    }
+    .recruit-header {
+      padding: 1.2rem 1.5rem 1rem;
+      background: #faf9f6; border-bottom: 1px solid #edeae4;
+    }
+    .recruit-title { font-size: 1.15rem; font-weight: bold; color: #1a1a2e; margin-bottom: .5rem; }
+    .recruit-meta { display: flex; flex-wrap: wrap; gap: .9rem; font-size: .82rem; color: #555; margin-bottom: .6rem; }
+    .recruit-meta span { display: flex; align-items: center; gap: .25rem; }
+    .recruit-full-badge {
+      display: inline-block; background: #c0706a; color: white;
+      font-size: .72rem; padding: .15rem .6rem; border-radius: 20px;
+      margin-left: .5rem; vertical-align: middle;
+    }
+    .participants-section { padding: 1rem 1.5rem .5rem; border-bottom: 1px solid #edeae4; }
+    .participants-title { font-size: .68rem; color: #bbb; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .6rem; }
+    .participant-list { display: flex; flex-direction: column; gap: .4rem; }
+    .participant-item {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .82rem; padding: .18rem .6rem .18rem .4rem;
+      border-radius: 20px; width: fit-content;
+    }
+    .participant-item.joined  { background: #e6f4ea; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .participant-item.wishful { background: #fff8e1; color: #e65100; border: 1px solid #ffe082; }
+    .join-section { padding: 1rem 1.5rem 1.2rem; }
+    .join-form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+    .join-input {
+      padding: .38rem .7rem; border: 1px solid #ddd; border-radius: 6px;
+      font-size: .82rem; font-family: inherit; width: 150px; background: #fafaf8;
+    }
+    .join-input:focus { outline: none; border-color: #c9a84c; background: white; }
+    .join-status-wrap { display: flex; gap: .4rem; }
+    .btn-join-status {
+      padding: .32rem .75rem; border: 1px solid #c9a84c80; border-radius: 6px;
+      background: transparent; color: #c9a84c; font-size: .78rem;
+      cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .btn-join-status:hover, .btn-join-status.selected { background: #c9a84c; color: #1a1a2e; }
+    .btn-join-submit {
+      padding: .32rem .9rem; background: #1a1a2e; color: #e8d8b4;
+      border: none; border-radius: 6px; font-size: .78rem;
+      cursor: pointer; font-family: inherit; transition: background .15s;
+    }
+    .btn-join-submit:hover { background: #2a2a4e; }
+    .btn-join-submit:disabled { opacity: .45; cursor: not-allowed; }
+    .join-msg { font-size: .78rem; color: #999; margin-top: .3rem; width: 100%; }
+  </style>
+</head>
+<body>
+
+  <!-- パスワード認証 -->
+  <div id="pw-overlay">
+    <div id="pw-box">
+      <h2>🔒 メンバー専用ページ</h2>
+      <p>パスワードを入力してください</p>
+      <input id="pw-input" type="password" placeholder="••••••"
+        onkeydown="if(event.key==='Enter') checkPw()">
+      <button id="pw-btn" onclick="checkPw()">入力</button>
+      <div id="pw-err"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const KEY = 'mm_auth_recruit';
+      const PW  = 'yyyyy';
+      if (sessionStorage.getItem(KEY) === '1') {
+        document.getElementById('pw-overlay').style.display = 'none';
+      }
+      window.checkPw = function () {
+        const val = document.getElementById('pw-input').value;
+        if (val === PW) {
+          sessionStorage.setItem(KEY, '1');
+          document.getElementById('pw-overlay').style.display = 'none';
+        } else {
+          document.getElementById('pw-err').textContent = '⚠️ パスワードが違います';
+          document.getElementById('pw-input').value = '';
+          document.getElementById('pw-input').focus();
+        }
+      };
+    })();
+  </script>
+
+  <header>
+    <h1>🎭 卓募集</h1>
+    <p class="subtitle">やゆよのマーダーミステリー</p>
+  </header>
+
+  <nav class="site-nav">
+    <a href="index.html"         class="nav-link">🔍 レビュー</a>
+    <a href="recruit.html"       class="nav-link active">🎭 卓募集</a>
+    <a href="recruit_admin.html" class="nav-link">📋 卓募集管理</a>
+    <a href="admin.html"         class="nav-link">⚙️ レビュー管理</a>
+  </nav>
+
+  <main>
+    <div id="recruit-list" style="max-width:760px;margin:2.5rem auto 4rem;padding:0 1.2rem;">
+      <p class="empty-state">読み込み中…</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© やゆよ — マーダーミステリー レビューブログ</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    let sessions = [];
+    const statusMap = {};
+
+    async function load() {
+      const { data, error } = await db
+        .from('recruit_sessions')
+        .select('*, recruit_participants(*)')
+        .order('created_at', { ascending: true });
+      if (error) { console.error(error); return; }
+      sessions = data || [];
+      sessions.forEach(s => { if (!statusMap[s.id]) statusMap[s.id] = '観戦希望'; });
+      render();
+    }
+
+    function render() {
+      const el = document.getElementById('recruit-list');
+      if (!sessions.length) {
+        el.innerHTML = '<p class="empty-state">現在募集中の卓はありません</p>';
+        return;
+      }
+      el.innerHTML = sessions.map(s => cardHTML(s)).join('');
+    }
+
+    function cardHTML(s) {
+      const participants = s.recruit_participants || [];
+      const count  = participants.length;
+      const isFull = s.is_full;
+      const fullBadge = isFull ? '<span class="recruit-full-badge">🎉 満員御礼</span>' : '';
+      const boothBtn  = s.booth_url
+        ? `<a class="booth-link" href="${esc(s.booth_url)}" target="_blank" rel="noopener">BOOTHで確認する</a>`
+        : '';
+      const sessionComment = s.comment
+        ? `<div style="font-size:.82rem;color:#555;margin-top:.5rem;">💬 ${esc(s.comment)}</div>`
+        : '';
+      const pItems = participants.map(p => {
+        const cls  = p.status === '観戦希望' ? 'joined' : 'wishful';
+        const icon = p.status === '観戦希望' ? '👁' : '🙋';
+        const note = p.comment ? `<span style="font-size:.74rem;opacity:.75;margin-left:.3rem;">— ${esc(p.comment)}</span>` : '';
+        return `<div class="participant-item ${cls}">${icon} ${esc(p.handle_name)}（${esc(p.status)}）${note}</div>`;
+      }).join('');
+
+      const joinForm = isFull ? '' : `
+        <div class="join-section">
+          <div class="join-form" id="form-${s.id}">
+            <input class="join-input" type="text" placeholder="ハンドルネーム" id="name-${s.id}" maxlength="20">
+            <div class="join-status-wrap">
+              <button class="btn-join-status selected" id="st-joined-${s.id}" onclick="selectStatus('${s.id}','観戦希望')">観戦希望</button>
+              <button class="btn-join-status" id="st-wishful-${s.id}" onclick="selectStatus('${s.id}','参加希望')">参加希望</button>
+            </div>
+          </div>
+          <div style="margin-top:.45rem;">
+            <input class="join-input" type="text" placeholder="コメント（任意）" id="comment-${s.id}" maxlength="60" style="width:100%;max-width:340px;">
+          </div>
+          <div style="margin-top:.5rem;">
+            <button class="btn-join-submit" onclick="submitJoin('${s.id}')">＋ 参加する</button>
+          </div>
+          <div class="join-msg" id="msg-${s.id}"></div>
+        </div>`;
+
+      return `
+        <div class="recruit-card" id="card-${s.id}">
+          <div class="recruit-header">
+            <div class="recruit-title">🎭 ${esc(s.scenario_name)}${fullBadge}</div>
+            <div class="recruit-meta">
+              <span>👥 ${count} / ${s.capacity}人</span>
+              <span>GM：${esc(s.gm_name || '未設定')}</span>
+            </div>
+            ${boothBtn}${sessionComment}
+          </div>
+          <div class="participants-section">
+            <div class="participants-title">参加者</div>
+            <div class="participant-list" id="plist-${s.id}">
+              ${pItems || '<span style="font-size:.8rem;color:#bbb">まだ誰もいません</span>'}
+            </div>
+          </div>
+          ${joinForm}
+        </div>`;
+    }
+
+    function selectStatus(sid, status) {
+      statusMap[sid] = status;
+      document.getElementById(`st-joined-${sid}`).classList.toggle('selected', status === '観戦希望');
+      document.getElementById(`st-wishful-${sid}`).classList.toggle('selected', status === '参加希望');
+    }
+
+    async function submitJoin(sid) {
+      const nameEl    = document.getElementById(`name-${sid}`);
+      const commentEl = document.getElementById(`comment-${sid}`);
+      const name      = nameEl.value.trim();
+      const comment   = commentEl ? commentEl.value.trim() : '';
+      const status    = statusMap[sid] || '観戦希望';
+      const msgEl     = document.getElementById(`msg-${sid}`);
+      if (!name) { msgEl.textContent = '⚠️ ハンドルネームを入力してください'; return; }
+      const btn = document.querySelector(`#form-${sid} ~ div > .btn-join-submit`);
+      if (btn) btn.disabled = true;
+      const { error } = await db.from('recruit_participants').insert({
+        session_id: sid, handle_name: name, status, comment: comment || null
+      });
+      if (error) {
+        msgEl.textContent = '❌ 登録に失敗しました';
+        if (btn) btn.disabled = false;
+        return;
+      }
+      msgEl.textContent = `✅ ${name} さんを登録しました！`;
+      nameEl.value = '';
+      if (commentEl) commentEl.value = '';
+      await load();
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    load();
+  </script>
+</body>
+</html>

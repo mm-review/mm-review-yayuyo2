@@ -1,0 +1,2 @@
+# Supabase接続情報（anonキー含む）を除外
+config.js

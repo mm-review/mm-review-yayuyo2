@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マーダーミステリー レビュー | やゆよ</title>
+  <meta name="description" content="やゆよのマーダーミステリー プレイ記録・レビューブログ">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>🔍 マーダーミステリー レビュー</h1>
+    <p class="subtitle">やゆよのプレイ記録</p>
+  </header>
+
+  <nav class="site-nav">
+    <a href="index.html"         class="nav-link active">🔍 レビュー</a>
+    <a href="recruit.html"       class="nav-link">🎭 卓募集</a>
+    <a href="recruit_admin.html" class="nav-link">📋 卓募集管理</a>
+    <a href="admin.html"         class="nav-link">⚙️ レビュー管理</a>
+  </nav>
+
+  <!-- フィルターバー -->
+  <section class="filter-section">
+    <div class="filter-inner">
+      <div class="filter-title">🔎 絞り込み</div>
+
+      <div class="filter-row">
+        <span class="filter-row-label">総合点</span>
+        <div class="range-control">
+          <span class="range-val" id="range-min-val">0</span>
+          <input type="range" class="filter-range" id="filter-min"
+            min="0" max="100" step="1" value="0" oninput="onFilterChange()">
+          <span class="range-sep">〜</span>
+          <input type="range" class="filter-range" id="filter-max"
+            min="0" max="100" step="1" value="100" oninput="onFilterChange()">
+          <span class="range-val" id="range-max-val">100</span>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <span class="filter-row-label">こだわり</span>
+        <div class="filter-chips">
+          <button class="filter-chip" data-key="suiri"     onclick="toggleChip(this)">推理重視</button>
+          <button class="filter-chip" data-key="roleplay"  onclick="toggleChip(this)">ロールプレイ重視</button>
+          <button class="filter-chip" data-key="design"    onclick="toggleChip(this)">デザイン重視</button>
+          <button class="filter-chip" data-key="gimmick"   onclick="toggleChip(this)">ギミック重視</button>
+          <button class="filter-chip" data-key="character" onclick="toggleChip(this)">キャラクター重視</button>
+        </div>
+      </div>
+
+      <div class="filter-footer">
+        <span id="filter-count"></span>
+        <button class="btn-clear-filter" onclick="clearFilters()">クリア</button>
+      </div>
+    </div>
+  </section>
+
+  <main id="review-list">
+    <!-- Supabase から自動生成されます -->
+  </main>
+
+  <footer>
+    <p>© やゆよ — マーダーミステリー レビューブログ</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+
+</body>
+</html>
